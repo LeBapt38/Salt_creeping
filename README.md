@@ -50,3 +50,24 @@ De plus, les critères précédent sont très arbitraires pour caractériser la 
 - Trouver des modèles physiques pour les différentes probabilités afin d'obtenir un modèle plus cohérent. Cela devrait dans le même temps donner les échelles à avoir pour la modélisation.
 
 - Trouver des critères plus objectifs pour s'assurer de la ressemblance du milieu (simension fractal pour caractériser la porosité...).
+
+## Le modèle physique
+### Explication du modèle pour les probabilités
+On essaie un premier modèle physique assez simple. On essaie d'estimer la différence d'énergie entre avant la cristallisation et après. Pour cela on sépare cette différence en deux :
+
+- La première correspond à la différence entre les ions dans l'eau et sous forme de cristal. Cette première contribution volumique est commune à toutes les probabilités et sera donc supprimer au final dans la normalisation. On ne la prends donc pas en compte. 
+- La deuxième contribution correspond aux liaisons entre le nouveau cristal et celui déjà existant. Ce cas va dépendre du nombre de bord commun. On estime ce terme à E=nb liaison * énergie d'une liaison. 
+
+On pose l = longueur d'une liaison, dx le pas de la simulation, e l'épaisseur de cristal et E_l l'énergie de liaison et n le nb de bord commun avec un ancien cristal. On arrive avec ce modèle à : 
+
+![](dev_theorique_proba.jpg)
+
+Dans le programme, cela donne exp(A/dx). 
+
+### Modèle pour la dynamique
+
+![](dev_theorique_tps.jpg)
+
+### Résultats
+
+A compléter.

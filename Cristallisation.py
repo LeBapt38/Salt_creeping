@@ -8,7 +8,11 @@ Created on Thu Sept  26 17:29:22 2024
 import numpy as np
 import random as rd
 import matplotlib.pyplot as plt
+from math import *
 
+beta = 1/(1.3e-23 * 310)
+A = beta * 2.3e-10 * 6.4e-19
+print(A)
 
 class case :
     def __init__(self, type = -1, proba = 0) :
@@ -21,19 +25,21 @@ class case :
         self.proba = self.nbVoisins * nbIons / nbCases
 
 class grille :
-    def __init__(self, taille, eau, probaGenese, boostAir) :
+    def __init__(self, taille, eau, A, boostAir, dx) :
         """
         Input :
             un tableau donnant la taille de la grille
             tuple des coordonnées du solide
             type de base pour les autres cases
         """
+        self.sizeInterface = 5
         self.dim = 2
-        self.probaGenese = probaGenese
+        self.A = A
         self.boostAir = boostAir
         self.nbCristaux = 0
         self.sizeX = taille[0]
         self.sizeY = taille[1]
+        self.dx = dx
         self.caseATraiter = []
         self.grille = np.array([[case() for i in range(self.sizeY)] for j in range(self.sizeX)])
         for i in eau :
@@ -51,7 +57,7 @@ class grille :
             elif i == -1 :
                 compteurAir += self.boostAir
         if len(a) > 0 :
-            return len(a)**2 + compteurAir
+            return exp((self.A/self.dx) * (len(a) + compteurAir))
         else :
             return 0
 
@@ -99,14 +105,14 @@ class grille :
         # Estime le nombre de case avec leur multiplicité
         for tup in self.caseATraiter :
             if self.grille[tup].nbVoisins == -1 :
-                nbCasePossible += self.probaGenese
+                nbCasePossible += 1
             else :
                 nbCasePossible += self.grille[tup].nbVoisins
         probaParCase = nbIons / nbCasePossible
 
         for tup in self.caseATraiter :
             if self.grille[tup].nbVoisins == -1 :
-                self.grille[tup].proba = self.probaGenese * probaParCase
+                self.grille[tup].proba = probaParCase
             else :
                 self.grille[tup].proba = self.grille[tup].nbVoisins * probaParCase
 
@@ -122,32 +128,42 @@ class grille :
                     self.grille[tup].type = self.nbCristaux
                 (i,j) = tup
                 (a,b) = self.grille.shape
+                nbAirEau = 0
                 # S'assure qu'il y a de l'eau tout autour de la nouvelle case
                 if j+1 < b :
                     if self.grille[i,j+1].type == -1 :
                         self.grille[i,j+1].type = 0
+                        nbAirEau += 1
                 if i+1 < a and j+1 < b :
                     if self.grille[i+1,j+1].type == -1 :
                         self.grille[i+1,j+1].type = 0
+                        nbAirEau += 1
                 if i > 0 and j+1 < b :
                     if self.grille[i-1,j+1].type == -1 :
                         self.grille[i-1,j+1].type = 0
+                        nbAirEau += 1
                 if i+1 < a :
                     if self.grille[i+1,j].type == -1 :
                         self.grille[i+1,j].type = 0
+                        nbAirEau += 1
                 if i > 0 :
                     if self.grille[i-1,j].type == -1 :
                         self.grille[i-1,j].type = 0
+                        nbAirEau += 1
                 if j > 0 :
                     if self.grille[i,j-1].type == -1 :
                         self.grille[i,j-1].type = 0
+                        nbAirEau += 1
                 if i < a-1 and j > 0 :
                     if self.grille[i+1,j-1].type == -1 :
                         self.grille[i+1,j-1].type = 0
+                        nbAirEau += 1
                 if i>0 and j>0 :
                     if self.grille[i-1,j-1].type == -1 :
                         self.grille[i-1,j-1].type = 0
-
+                        nbAirEau += 1
+                if nbAirEau > 0 :
+                    self.sizeInterface += nbAirEau - 1
             self.grille[tup].nbVoisins = 0
             self.grille[tup].proba = 0
             self.grille[tup].typeVoisin = 0
