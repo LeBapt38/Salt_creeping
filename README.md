@@ -68,6 +68,16 @@ Dans le programme, cela donne exp(A/dx).
 
 ![](dev_theorique_tps.jpg)
 
+### Ajustements informatiques
+
+Changement des règles de nucléations. Les nouveaux cristaux peuvent maintenant se former que en "parallèle" des anciens et plus dans les angles comme avant. 
+
 ### Résultats
 
-A compléter.
+![](Modèle_phys_creeping.png)
+
+Les échelles sont en dixième de micromètres sur la simulation. L'image de l'expérience fait environ 100µm de large.
+
+![](PICT0008.JPG)
+
+On en déduit que les cristaux de la simulation sont encore trop petit. Plus de la taille de ceux coincé dans les interstice. Peut être liée au fait que l'on ne regarde pas la recombination des différents cristaux. Ce sera donc la prochaine étape.

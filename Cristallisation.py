@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from math import *
 
 beta = 1/(1.3e-23 * 310)
-A = beta * 2.3e-10 * 6.4e-19
+A = (pi / 2) * beta * 2.3e-10 * 6.4e-19
 print(A)
 
 class case :
@@ -57,7 +57,8 @@ class grille :
             elif i == -1 :
                 compteurAir += self.boostAir
         if len(a) > 0 :
-            return exp((self.A/self.dx) * (len(a) + compteurAir))
+            # les divisions permettent de prendre en compte les différentes situations
+            return exp((self.A/self.dx) * (len(a)//4 + len(a)//5 + 1 + compteurAir))
         else :
             return 0
 
@@ -67,15 +68,38 @@ class grille :
         """
         for i in range(self.sizeX) :
             for j in range(self.sizeY) :
-                if self.grille[i,j].type == 0 :
+                # evite que les nouveaux cristaux se place que dans les angles des anciens
+                test = False
+                if self.grille[i,j].type == -1 :
+                    if i > 0 :
+                        if self.grille[i-1, j].type == 0 :
+                            test = True
+                    if j > 0 :
+                        if self.grille[i, j-1].type == 0 :
+                            test = True
+                    if i < self.sizeX-1 :
+                        if self.grille[i+1, j].type == 0 :
+                            test = True
+                    if j < self.sizeY-1 :
+                        if self.grille[i, j+1].type == 0 :
+                            test = True
+                if self.grille[i,j].type == 0 or test :
                     # Si on est dans l'eau on fait le point de ce qu'il y a autour
                     typeVoisins = []
                     if i > 0 :
                         typeVoisins.append(self.grille[i-1,j].type)
+                        if j > 0 :
+                            typeVoisins.append(self.grille[i-1,j-1].type)
+                        if j < self.sizeY-1 :
+                            typeVoisins.append(self.grille[i-1,j+1].type)
                     if j > 0 :
                         typeVoisins.append(self.grille[i, j-1].type)
                     if i < self.sizeX-1 :
                         typeVoisins.append(self.grille[i+1,j].type)
+                        if j > 0 :
+                            typeVoisins.append(self.grille[i+1,j-1].type)
+                        if j < self.sizeY-1 :
+                            typeVoisins.append(self.grille[i+1,j+1].type)
                     if j < self.sizeY-1 :
                         typeVoisins.append(self.grille[i,j+1].type)
                     a = self.nbVoisins(typeVoisins)
@@ -92,6 +116,9 @@ class grille :
                                 #Regarde les cases un cran plus loin
                                 if a and (self.grille[i-2+k, j-2].type > 0 or self.grille[i-2+k, j+2].type > 0 or self.grille[i-2, j-2+k].type > 0 or self.grille[i+2, j-2+k].type > 0):
                                     a = False
+                            if self.grille[i+1, j+1].type > 0 or self.grille[i-1, j+1].type > 0 or self.grille[i+1, j-1].type > 0 or self.grille[i-1, j-1].type > 0 :
+                                #print(a)
+                                a = True
                             if not a :
                                 self.grille[i,j].nbVoisins = -1
                                 self.caseATraiter.append((i,j))
