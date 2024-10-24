@@ -76,8 +76,27 @@ Changement des règles de nucléations. Les nouveaux cristaux peuvent maintenant
 
 ![](Modèle_phys_creeping.png)
 
-Les échelles sont en dixième de micromètres sur la simulation. L'image de l'expérience fait environ 100µm de large.
+Les échelles sont en dixième de micromètres sur la simulation. Il y a eu 10 000 pas de temps.
+ 
+L'image de l'expérience fait environ 100µm de large.
 
 ![](PICT0008.JPG)
 
 On en déduit que les cristaux de la simulation sont encore trop petit. Plus de la taille de ceux coincé dans les interstice. Peut être liée au fait que l'on ne regarde pas la recombination des différents cristaux. Ce sera donc la prochaine étape.
+
+## Analyse plus complète
+Je modifie le code pour que nbCristaux non seulement énumère les cristaux mais vient également donner leur taille individuel. Cela permet d'avoir aisément accès à la distribution en taille des cristaux (en orange sur la courbe).
+
+Avec une estimation grossière sur une vingtaine de cristaux, je crée une distribution expérimentale de la taille des cristaux (en bleu sur la courbe).
+
+![](distribution_taille_cristaux.png)
+(absisce en m^2 pas en m)
+
+On observe que les cristaux sont un ordre de grandeur trop petit sur la modélisation. De plus, la distribution est exponentielle ce qui ne semble pas être le cas pour la réalité... 
+
+Plusieur piste pour améliorer le code : 
+
+- Prendre en compte les cristaux qui se colle ensemble.
+- Enlever la dépendance au paramètres informatiques afin de pouvoir réduire la pas d'espace.
+
+Les deux semblent compliquer à mettre en place sans repenser tous le code. Il serait donc bon de s'assurer que ce n'est pas partir dans la mauvaise direction;

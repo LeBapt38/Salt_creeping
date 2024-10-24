@@ -25,7 +25,7 @@ class case :
         self.proba = self.nbVoisins * nbIons / nbCases
 
 class grille :
-    def __init__(self, taille, eau, A, boostAir, dx) :
+    def __init__(self, taille, A, boostAir, dx) :
         """
         Input :
             un tableau donnant la taille de la grille
@@ -36,14 +36,20 @@ class grille :
         self.dim = 2
         self.A = A
         self.boostAir = boostAir
-        self.nbCristaux = 0
         self.sizeX = taille[0]
         self.sizeY = taille[1]
         self.dx = dx
         self.caseATraiter = []
         self.grille = np.array([[case() for i in range(self.sizeY)] for j in range(self.sizeX)])
-        for i in eau :
-            self.grille[i].type = 0
+        #On initialise avec deja un cristal
+        self.grille[0,self.sizeY // 2].type = 1
+        self.grille[0,self.sizeY // 2 + 1].type = 0
+        self.grille[0,self.sizeY // 2 - 1].type = 0
+        self.grille[1,self.sizeY // 2 + 1].type = 0
+        self.grille[1,self.sizeY // 2 - 1].type = 0
+        self.grille[1,self.sizeY // 2].type = 0
+
+        self.nbCristaux = [1]
 
     def nbVoisins(self, typeVoisins) :
         a = []
@@ -150,9 +156,10 @@ class grille :
             if self.grille[tup].proba > a :
                 if self.grille[tup].typeVoisin > 0 :
                     self.grille[tup].type = self.grille[tup].typeVoisin
+                    self.nbCristaux[self.grille[tup].type - 1] += 1
                 else :
-                    self.nbCristaux += 1
-                    self.grille[tup].type = self.nbCristaux
+                    self.nbCristaux.append(1)
+                    self.grille[tup].type = len(self.nbCristaux)
                 (i,j) = tup
                 (a,b) = self.grille.shape
                 nbAirEau = 0
@@ -203,6 +210,21 @@ class grille :
             self.Voisins()
             self.proba(nbIons)
             self.nvIons()
+
+    def tailleCristaux(self, affichage = True) :
+        tailleMin = min(self.nbCristaux)
+        tailleMax = max(self.nbCristaux)
+        X = np.linspace(tailleMin * self.dx * self.dx, tailleMax * self.dx * self.dx, tailleMax-tailleMin)
+        Y = np.zeros(tailleMax-tailleMin + 1)
+        for l in self.nbCristaux :
+            Y[l-tailleMin] += 1
+        if affichage :
+            plt.scatter(X,Y)
+            plt.xlabel('Surface cristaux en m')
+            plt.ylabel('Nb Cristaux')
+            plt.title('Distribution de la taille des cristaux')
+            plt.show()
+        return(X,Y)
 
     def affichage(self) :
         grilleAffichage = np.array([[0 for i in range(self.sizeY)] for j in range(self.sizeX)])
